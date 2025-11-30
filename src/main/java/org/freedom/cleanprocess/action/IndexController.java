@@ -2,14 +2,20 @@ package org.freedom.cleanprocess.action;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.freedom.cleanprocess.ProcessApp;
+import org.freedom.cleanprocess.component.NotificationUtil;
 import org.freedom.cleanprocess.entiy.ProcessInfo;
+import org.freedom.cleanprocess.util.SceneUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,17 +47,17 @@ public class IndexController implements Initializable {
     private TableColumn<ProcessInfo, String> actionColumn;
     @FXML
     private Button refreshButton;
+    
+    @FXML
+    private Button toolboxButton;
+    
+    @FXML
+    private Label processCountLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         processTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        // 设置按钮样式
-        refreshButton.setStyle(
-                "-fx-background-color: #4CAF50; " + // 背景颜色
-                        "-fx-text-fill: white; " +         // 文字颜色
-                        "-fx-font-size: 14px; " +          // 字体大小
-                        "-fx-padding: 8px 15px;"          // 内边距
-        );
+
         // 自定义 CellValueFactory
         processNameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getName()));
@@ -65,6 +71,7 @@ public class IndexController implements Initializable {
                 new SimpleStringProperty(cellData.getValue().getJvm()));
         actionColumn.setCellFactory(getButtonCellFactory());
         loadProcessInfo();
+        updateProcessCount();
     }
 
     private void loadProcessInfo() {
@@ -80,10 +87,11 @@ public class IndexController implements Initializable {
                     throw new RuntimeException(e);
                 }
                 ProcessInfo processInfo = ProcessInfo.builder().name(name).pid(pid).memory(memory)
-                        .processType("java").jvm("")
+                        .processType("Java").jvm("")
                         .build();
                 processTableView.getItems().add(processInfo);
             });
+            updateProcessCount();
         } catch (Exception e) {
             logger.error("loadProcessInfo error:",e);
         }
@@ -164,12 +172,24 @@ public class IndexController implements Initializable {
 
     private Callback<TableColumn<ProcessInfo, String>,TableCell<ProcessInfo, String>> getButtonCellFactory() {
         return param -> new TableCell<>() {
-            private final Button btn = new Button("结束进程");
+            private final Button btn = new Button("❌ 结束");
             {
+                // 设置按钮样式
+                btn.setStyle("-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-size: 12px; " +
+                            "-fx-padding: 6 16; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-weight: bold;");
+                
                 btn.setOnAction(event -> {
                     ProcessInfo process = getTableView().getItems().get(getIndex());
                     terminateProcess(process);
                 });
+                
+                // 鼠标悬停效果
+                btn.setOnMouseEntered(e -> btn.setStyle(
+                    "-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-size: 12px; " +
+                    "-fx-padding: 6 16; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-weight: bold;"));
+                btn.setOnMouseExited(e -> btn.setStyle(
+                    "-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-size: 12px; " +
+                    "-fx-padding: 6 16; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-weight: bold;"));
             }
 
             @Override
@@ -193,11 +213,21 @@ public class IndexController implements Initializable {
                 logger.info("进程 {} 已成功结束", processInfo.getPid());
                 // 从 TableView 中移除已结束的进程
                 processTableView.getItems().remove(processInfo);
+                updateProcessCount();
+                
+                // 显示成功通知
+                Stage stage = (Stage) processTableView.getScene().getWindow();
+                NotificationUtil.showSuccess(stage, 
+                    "进程 " + processInfo.getName() + "(PID: " + processInfo.getPid() + ") 已成功结束！");
             } else {
                 logger.error("结束进程 {} 失败", processInfo.getPid());
+                Stage stage = (Stage) processTableView.getScene().getWindow();
+                NotificationUtil.showError(stage, "结束进程失败！");
             }
         } catch (IOException | InterruptedException e) {
             logger.error("结束进程时发生错误", e);
+            Stage stage = (Stage) processTableView.getScene().getWindow();
+            NotificationUtil.showError(stage, "结束进程时发生错误: " + e.getMessage());
         }
     }
 
@@ -205,11 +235,44 @@ public class IndexController implements Initializable {
     public void handleRefreshButtonClick () {
         processTableView.getItems().clear();
         loadProcessInfo();
-        // 创建提示框
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("提示");
-        alert.setHeaderText(null); // 不显示标题
-        alert.setContentText("数据已刷新！");
-        alert.showAndWait(); // 显示提示框并等待用户关闭
+        updateProcessCount();
+        // 显示自定义通知
+        Stage stage = (Stage) processTableView.getScene().getWindow();
+        NotificationUtil.showSuccess(stage, "✅ 进程列表已刷新！");
+    }
+    
+    @FXML
+    public void handleMouseEntered() {
+        refreshButton.setStyle("-fx-background-color: #5568d3; -fx-text-fill: white; -fx-font-size: 13px; " +
+                              "-fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;");
+    }
+    
+    @FXML
+    public void handleMouseExited() {
+        refreshButton.setStyle("-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 13px; " +
+                              "-fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;");
+    }
+    
+    /**
+     * 更新进程计数标签
+     */
+    private void updateProcessCount() {
+        if (processCountLabel != null) {
+            int count = processTableView.getItems().size();
+            processCountLabel.setText("当前进程: " + count);
+        }
+    }
+    
+    /**
+     * 打开工具集合页面
+     */
+    @FXML
+    public void handleToolboxButtonClick() {
+        try {
+            Stage stage = (Stage) toolboxButton.getScene().getWindow();
+            SceneUtil.switchScene(stage, "fxml/toolbox.fxml");
+        } catch (Exception e) {
+            logger.error("打开工具集合页面失败", e);
+        }
     }
 }

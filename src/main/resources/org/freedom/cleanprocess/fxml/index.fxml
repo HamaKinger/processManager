@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" minWidth="850.0" minHeight="500.0" style="-fx-background-color: #f5f5f5;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="org.freedom.cleanprocess.action.IndexController">
+    
+    <!-- 顶部标题栏 -->
+    <top>
+        <VBox style="-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); -fx-padding: 20;" BorderPane.alignment="CENTER">
+            <Label text="Java 进程管理器" textFill="WHITE" style="-fx-font-weight: bold;">
+                <font>
+                    <Font size="24.0" />
+                </font>
+            </Label>
+            <Label text="管理和监控 Java 进程，一键清理残留进程" textFill="#e0e0e0" style="-fx-padding: 5 0 0 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </Label>
+        </VBox>
+    </top>
+    
+    <!-- 中间内容区域 -->
+    <center>
+        <VBox spacing="15.0" style="-fx-background-color: #f5f5f5;" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            
+            <!-- 工具栏 -->
+            <HBox spacing="12.0" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                <Button fx:id="refreshButton" onAction="#handleRefreshButtonClick" text="🔄 刷新进程" 
+                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" 
+                        onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited" />
+                <Button fx:id="toolboxButton" onAction="#handleToolboxButtonClick" text="🛠️ 工具集合" 
+                        style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                <Button text="🔌 SSH" 
+                        style="-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                
+                <!-- 统计信息 -->
+                <Label fx:id="processCountLabel" text="当前进程: 0" style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-padding: 0 0 0 30;">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                </Label>
+            </HBox>
+            
+            <!-- 表格区域 -->
+            <VBox VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                <padding>
+                    <Insets top="10.0" bottom="10.0" left="10.0" right="10.0" />
+                </padding>
+                
+                <TableView fx:id="processTableView" VBox.vgrow="ALWAYS" maxWidth="900" 
+                          style="-fx-background-color: white; -fx-table-cell-border-color: transparent; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;">
+                    <columns>
+                        <TableColumn fx:id="processNameColumn" text="📋 进程名称" prefWidth="200.0" minWidth="150.0" maxWidth="250.0" 
+                                    style="-fx-alignment: CENTER-LEFT; -fx-font-size: 13px; -fx-font-weight: bold;">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="name" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="processIdColumn" text="🆔 进程 PID" prefWidth="100.0" minWidth="80.0" maxWidth="120.0" 
+                                    style="-fx-alignment: CENTER; -fx-font-size: 13px; -fx-font-weight: bold;">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="pid" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="processMemoryColumn" text="💾 内存使用" prefWidth="120.0" minWidth="100.0" maxWidth="150.0" 
+                                    style="-fx-alignment: CENTER; -fx-font-size: 13px; -fx-font-weight: bold;">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="memory" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="processProcessTypeColumn" text="📦 进程类型" prefWidth="100.0" minWidth="80.0" maxWidth="120.0" 
+                                    style="-fx-alignment: CENTER; -fx-font-size: 13px; -fx-font-weight: bold;">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="processType" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="processJvmParam" text="⚙️ JVM 参数" prefWidth="200.0" minWidth="150.0" maxWidth="300.0" 
+                                    style="-fx-alignment: CENTER-LEFT; -fx-font-size: 13px; -fx-font-weight: bold;">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="jvm" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="actionColumn" text="🎯 操作" prefWidth="130.0" minWidth="130.0" maxWidth="130.0" resizable="false" 
+                                    style="-fx-alignment: CENTER; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+    
+    <!-- 底部状态栏 -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: white; -fx-padding: 12; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
+            <Label text="💡 提示: 点击刷新按钮更新进程列表，点击结束进程按钮清理残留进程" style="-fx-text-fill: #666; -fx-font-size: 11px;" />
+        </HBox>
+    </bottom>
+    
+</BorderPane>

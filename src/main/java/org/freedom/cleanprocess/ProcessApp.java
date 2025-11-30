@@ -19,10 +19,20 @@ public class ProcessApp extends Application {
     @Override
     public void start (Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(ProcessApp.class
-                .getResource("index.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(),580,420);
-        stage.setTitle("进程清除");
+                .getResource("fxml/index.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        
+        // 加载CSS样式文件
+        URL cssResource = ProcessApp.class.getResource("css/styles.css");
+        if(cssResource != null) {
+            scene.getStylesheets().add(cssResource.toExternalForm());
+        }
+        
+        stage.setTitle("Java 进程管理器");
         stage.setScene(scene);
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
+        
         URL resource = ProcessApp.class.getResource("/logo/logo.png");
         if(resource!=null){
             stage.getIcons().add(new Image(resource.toString()));

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" minWidth="800.0" minHeight="500.0" style="-fx-background-color: #f5f5f5;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="org.freedom.cleanprocess.action.tools.XmlToJsonController">
+    
+    <!-- 顶部标题栏 -->
+    <top>
+        <VBox style="-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); -fx-padding: 20;" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <!-- 返回按钮 -->
+                <Button fx:id="backButton" onAction="#handleBackButtonClick" text="← 返回" 
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                
+                <VBox>
+                    <Label text="🔄 XML 转 JSON 工具" textFill="WHITE" style="-fx-font-weight: bold;">
+                        <font>
+                            <Font size="24.0" />
+                        </font>
+                    </Label>
+                    <Label text="XML与JSON格式互相转换" textFill="#e0e0e0" style="-fx-padding: 5 0 0 0;">
+                        <font>
+                            <Font size="12.0" />
+                        </font>
+                    </Label>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- 中间内容区域 -->
+    <center>
+        <VBox spacing="15.0" style="-fx-background-color: #f5f5f5;" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            
+            <!-- 工具栏 -->
+            <HBox spacing="12.0" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                <Button fx:id="xmlToJsonButton" onAction="#handleXmlToJsonClick" text="➡️ XML → JSON" 
+                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                <Button fx:id="jsonToXmlButton" onAction="#handleJsonToXmlClick" text="⬅️ JSON → XML" 
+                        style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                <Button fx:id="clearButton" onAction="#handleClearButtonClick" text="🗑️ 清空" 
+                        style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                <Button fx:id="copyButton" onAction="#handleCopyButtonClick" text="📋 复制结果" 
+                        style="-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;" />
+                
+                <!-- 格式化选项 -->
+                <CheckBox fx:id="prettyPrintCheckBox" text="格式化输出" selected="true"
+                         style="-fx-font-size: 13px; -fx-text-fill: #2d3748; -fx-font-weight: bold;" />
+            </HBox>
+            
+            <!-- 输入输出区域 -->
+            <HBox spacing="15.0" VBox.vgrow="ALWAYS">
+                <!-- 输入区域 -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                    <Label text="输入内容：" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3748;" />
+                    <Label text="请输入XML或JSON数据" style="-fx-font-size: 12px; -fx-text-fill: #718096;" />
+                    <TextArea fx:id="inputTextArea" wrapText="true" VBox.vgrow="ALWAYS" 
+                             promptText="请输入XML或JSON数据...&#10;&#10;XML示例:&#10;&lt;root&gt;&#10;  &lt;name&gt;张三&lt;/name&gt;&#10;  &lt;age&gt;25&lt;/age&gt;&#10;&lt;/root&gt;&#10;&#10;JSON示例:&#10;{&#10;  &quot;name&quot;: &quot;张三&quot;,&#10;  &quot;age&quot;: 25&#10;}"
+                             style="-fx-font-family: 'Consolas', 'Monaco', monospace; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-radius: 4; -fx-background-radius: 4;" />
+                </VBox>
+                
+                <!-- 输出区域 -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                    <Label text="输出结果：" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3748;" />
+                    <Label text="转换后的结果将显示在这里" style="-fx-font-size: 12px; -fx-text-fill: #718096;" />
+                    <TextArea fx:id="outputTextArea" wrapText="true" VBox.vgrow="ALWAYS" editable="false"
+                             promptText="转换结果将显示在这里..."
+                             style="-fx-font-family: 'Consolas', 'Monaco', monospace; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #f7fafc;" />
+                </VBox>
+            </HBox>
+            
+            <!-- 使用提示卡片 -->
+            <VBox spacing="10" style="-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-padding: 15; -fx-border-color: #cbd5e0; -fx-border-width: 1; -fx-border-radius: 8;">
+                <Label text="📖 使用说明：" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2d3748;" />
+                <HBox spacing="30">
+                    <VBox spacing="5">
+                        <Label text="• XML → JSON：将XML格式转换为JSON格式" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                        <Label text="• JSON → XML：将JSON格式转换为XML格式" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                        <Label text="• 支持格式化输出，便于阅读" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label text="• 自动识别和处理属性" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                        <Label text="• 保留数据结构层次关系" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                        <Label text="• 支持复杂嵌套结构" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+                    </VBox>
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+    
+    <!-- 底部状态栏 -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: white; -fx-padding: 12; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
+            <Label text="💡 提示: XML和JSON是两种常用的数据交换格式" style="-fx-text-fill: #666; -fx-font-size: 11px;" />
+        </HBox>
+    </bottom>
+    
+</BorderPane>
